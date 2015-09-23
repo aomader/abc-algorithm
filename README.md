@@ -1,4 +1,4 @@
-# abc-algorithm
+# abc-algorithm [![Build Status](https://travis-ci.org/b52/abc-algorithm.svg?branch=master)](https://travis-ci.org/b52/abc-algorithm) [![Coverage Status](https://coveralls.io/repos/b52/abc-algorithm/badge.svg?branch=master&service=github)](https://coveralls.io/github/b52/abc-algorithm?branch=master)
 
 A [Rust] implementation of the [Artificial Bee Colony (ABC) Algorithm] by
 Karaboga [[1]].
