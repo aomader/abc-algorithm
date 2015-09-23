@@ -96,6 +96,7 @@ impl Config {
     }
 }
 
+
 struct Optimizer<'a> {
     rng: XorShiftRng,
     config: &'a Config,
@@ -344,25 +345,44 @@ mod benches {
     use super::problems::*;
 
     macro_rules! benches {
-        ($($name: ident, $d: expr, $l: expr, $u: expr, $y: expr, $e: expr, $f: ident;)*) => {
+        ($($name: ident, $d: expr, $l: expr, $u: expr, $y: expr, $e: expr, $xs: expr, $f: ident;)*) => {
             $(
                 #[bench]
                 fn $name(b: &mut Bencher) {
+                    let optimum = $xs;
+                    assert!($d == optimum.len());
+
                     let mut abc = Config::new();
                     abc.stop(TargetValue($y, $e));
 
-                    b.iter(|| abc.optimize($d, $l, $u, &$f))
+                    b.iter(|| {
+                        let solution = abc.optimize($d, $l, $u, &$f);
+
+                        for i in 0..$d {
+                            assert!((solution.xs[i] - optimum[i]).abs() < 1.0e-5);
+                        }
+
+                        solution
+                    })
                 }
             )*
         }
     }
 
     benches! {
-        ackley_1d, 1, -32.768, 32.768, 0.0, 1.0e-10, ackley;
-        ackley_2d, 2, -32.768, 32.768, 0.0, 1.0e-10, ackley;
-        ackley_4d, 4, -32.768, 32.768, 0.0, 1.0e-10, ackley;
-        ackley_8d, 8, -32.768, 32.768, 0.0, 1.0e-10, ackley;
-        ackley_16d, 16, -32.768, 32.768, 0.0, 1.0e-10, ackley;
+        sphere_01d, 1, -5.12, 5.12, 0.0, 1.0e-10, vec![0.0f64; 1], sphere;
+        sphere_02d, 2, -5.12, 5.12, 0.0, 1.0e-10, vec![0.0f64; 2], sphere;
+        sphere_04d, 4, -5.12, 5.12, 0.0, 1.0e-10, vec![0.0f64; 4], sphere;
+        sphere_08d, 8, -5.12, 5.12, 0.0, 1.0e-10, vec![0.0f64; 8], sphere;
+        sphere_16d, 16, -5.12, 5.12, 0.0, 1.0e-10, vec![0.0f64; 16], sphere;
+
+        ackley_01d, 1, -32.768, 32.768, 0.0, 1.0e-10, vec![0.0f64; 1], ackley;
+        ackley_02d, 2, -32.768, 32.768, 0.0, 1.0e-10, vec![0.0f64; 2], ackley;
+        ackley_04d, 4, -32.768, 32.768, 0.0, 1.0e-10, vec![0.0f64; 4], ackley;
+        ackley_08d, 8, -32.768, 32.768, 0.0, 1.0e-10, vec![0.0f64; 8], ackley;
+        ackley_16d, 16, -32.768, 32.768, 0.0, 1.0e-10, vec![0.0f64; 16], ackley;
+
+        booth_2d, 2, -10.0, 10.0, 0.0, 1.0e-10, vec![1.0, 3.0], booth;
     }
 }
 
@@ -371,6 +391,12 @@ mod benches {
 mod problems {
     use std::f64::consts::PI;
 
+    // bowl-shaped
+    pub fn sphere(xs: &[f64]) -> f64 {
+        xs.iter().map(|v| v * v).sum()
+    }
+
+    // many local minima
     pub fn ackley(xs: &[f64]) -> f64 {
         let a = 20.0;
         let b = 0.2;
@@ -380,16 +406,10 @@ mod problems {
             (xs.iter().map(|&x| (c*x).cos()).sum::<f64>() / xs.len() as f64).exp() + a + 1.0f64.exp()
     }
 
-    pub fn sphere(xs: &[f64]) -> f64 {
-        xs.iter().map(|v| v * v).sum()
-    }
+    // plate-shaped
+    pub fn booth(xs: &[f64]) -> f64 {
+        assert!(xs.len() == 2);
 
-/*
-    fn Rastrigin(xs: &[f64]) -> f64 {
-        let y = xs.iter().map(|v| {
-            v.powi(2) - 10.0 * (2.0 * PI * v).cos()
-        }).sum::<f64>() + 10.0;
-        println!("y = {}", y);
-        return y;
-    }*/
+        (xs[0] + 2.0*xs[1] - 7.0).powi(2) + (2.0*xs[0] + xs[1] - 5.0).powi(2)
+    }
 }
