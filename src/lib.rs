@@ -31,6 +31,23 @@ pub enum StopCriterion {
 }
 
 
+/// Groups information relevant to a solution.
+#[derive(Clone, Debug)]
+pub struct Solution {
+    /// The set of parameters supplied to the objective function.
+    pub xs: Vec<f64>,
+
+    /// Target value for the set of parameters.
+    pub y: f64,
+
+    /// Number of function evaluations.
+    pub evals: usize,
+
+    /// Number of iterations.
+    pub iters: usize
+}
+
+
 /// Provide means to adjust the main paramters driving the algorithm.
 pub struct Config {
     foods: usize,
@@ -81,11 +98,8 @@ impl Config {
 
     /// Optimize the given objective function by using the ABC algorithm with
     /// the specified parameters.
-    pub fn optimize<F>(&self, dimensions: usize, low: f64, high: f64, objective: F)
-        -> Solution
-        where //X: Float,
-              //Y: NumCast + Zero + PartialOrd + Clone,
-              F: Fn(&[f64]) -> f64
+    pub fn optimize<F>(&self, dimensions: usize, low: f64, high: f64, objective: F) -> Solution
+        where F: Fn(&[f64]) -> f64
     {
         assert!(dimensions > 0, "`dimensions` must be greater than zero");
         assert!(low.is_finite(), "`low` must be a finite number");
@@ -299,7 +313,6 @@ impl<'a> Optimizer<'a> {
         Solution {
             xs: optimum.xs,
             y: optimum.y,
-            fitness: optimum.fitness,
             evals: self.evals,
             iters: self.iter + 1
         }
@@ -315,14 +328,6 @@ struct Candidate {
     trials: usize
 }
 
-#[derive(Debug)]
-pub struct Solution {
-    pub xs: Vec<f64>,
-    pub y: f64,
-    pub fitness: f64,
-    pub evals: usize,
-    pub iters: usize
-}
 
 #[inline(always)]
 fn calc_fitness(y: f64) -> f64 {
