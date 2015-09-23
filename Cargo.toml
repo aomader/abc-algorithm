@@ -1,0 +1,16 @@
+[package]
+name = "abc_algorithm"
+version = "0.1.0"
+authors = ["Oliver Mader <b52@reaktor42.de>"]
+
+description = "The Artificial Bee Colony (ABC) algorithm is a swarm based meta-heuristic algorithm for optimizing numerical problems."
+keywords = ["optimization", "abc", "heuristic", "evolutionary", "algorithm"]
+license = "MIT"
+
+[dependencies]
+rand = "^0.3.11"
+num = "^0.1.27"
+either = "^0.1.2"
+
+[features]
+unstable = []
