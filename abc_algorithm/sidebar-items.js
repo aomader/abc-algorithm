@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["StopCriterion","A set of possible criteria to decide when to stop the optimization."]],"struct":[["Config","Provide means to adjust the main paramters driving the algorithm."],["Solution","Groups information relevant to a solution."]]});
